@@ -1459,7 +1459,7 @@ public partial class NavigationView : HeaderedContentControl
             if (!isSettings)
             {
                 var contFromData = NavigationViewItemBaseOrSettingsContentFromData(item);
-                item = contFromData.Content;
+                item = contFromData?.Content;
                 container = contFromData;
             }
             else
