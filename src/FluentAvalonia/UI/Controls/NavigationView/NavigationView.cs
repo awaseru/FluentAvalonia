@@ -1356,7 +1356,7 @@ public partial class NavigationView : HeaderedContentControl
         // In this case, we'll raise the SelectionChanged at that time, as otherwise it'll never be raised.
         if (_isSelectionChangedPending)
         {
-            AnimateSelectionChanged(FindLowestLevelContainerToDisplaySelectionIndicator());
+            AnimateSelectionChanged(_pendingSelectionChangedItem);
             _isSelectionChangedPending = false;
 
             var item = _pendingSelectionChangedItem;
