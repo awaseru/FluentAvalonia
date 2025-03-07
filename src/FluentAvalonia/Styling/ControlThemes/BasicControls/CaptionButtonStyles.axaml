@@ -48,7 +48,8 @@
                       </Button>
 
                       <Button x:Name="PART_MinimizeButton"
-                              Theme="{StaticResource FluentCaptionButton}">
+                              Theme="{StaticResource FluentCaptionButton}"
+                              IsTabStop="False">
                           <Viewbox Width="11" Margin="2">
                               <Path Stretch="UniformToFill"
                                     Fill="{TemplateBinding Foreground}"
@@ -57,7 +58,8 @@
                       </Button>
 
                       <Button x:Name="PART_RestoreButton"
-                              Theme="{StaticResource FluentCaptionButton}">
+                              Theme="{StaticResource FluentCaptionButton}"
+                              IsTabStop="False">
                           <Viewbox Width="11" Margin="2">
                               <Viewbox.RenderTransform>
                                   <RotateTransform Angle="-90" />
@@ -72,7 +74,8 @@
                       <Button x:Name="PART_CloseButton"
                               Background="#ffe81123"
                               BorderBrush="#fff1707a"
-                              Theme="{StaticResource FluentCaptionButton}">
+                              Theme="{StaticResource FluentCaptionButton}"
+                              IsTabStop="False">
                           <Viewbox Width="11" Margin="2">
                               <Path Stretch="UniformToFill"
                                     Fill="{TemplateBinding Foreground}"
