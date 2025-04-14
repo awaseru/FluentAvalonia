@@ -350,6 +350,9 @@ public partial class TaskDialog : ContentControl
 
     private async void FinalCloseDialog(object result)
     {
+        _defaultButtonIsEnabledSubscription?.Dispose();
+        _defaultButtonIsEnabledSubscription = null;
+
         void ReturnDialogToParent()
         {
             if (_xamlOwner == null)
@@ -492,6 +495,18 @@ public partial class TaskDialog : ContentControl
                 foundDefault = true;
                 b.Classes.Add(SharedPseudoclasses.s_cAccent);
                 _defaultButton = b;
+
+                _defaultButtonIsEnabledSubscription = _defaultButton.GetObservable(Button.IsEnabledProperty).Subscribe(newValue =>
+                {
+                    if (!newValue) // If the default button has been disabled, focus the main dialog.
+                    {
+                        Focus();
+                    }
+                    else // Otherwise, refocus the default button.
+                    {
+                        _defaultButton.Focus();
+                    }
+                });
             }
             buttons.Add(b);
         }
@@ -596,29 +611,9 @@ public partial class TaskDialog : ContentControl
         if (!setFocus)
             return;
 
-        // Default button gets priority focus
-        if (_defaultButton != null)
+        if (_defaultButton?.Focus() != true)
         {
-            _defaultButton.Focus();
-#if DEBUG
-            Logger.TryGet(LogEventLevel.Debug, "TaskDialog")?.Log("TrySetInitialFocus", "Set initial focus to requested DefaultButton");
-#endif
-        }
-        else
-        {
-            var next = KeyboardNavigationHandler.GetNext(this, NavigationDirection.Next);
-            if (next != null)
-            {
-                next.Focus();
-            }
-            else
-            {
-                this.Focus();
-            }
-
-#if DEBUG
-            Logger.TryGet(LogEventLevel.Debug, "TaskDialog")?.Log("TrySetInitialFocus", "Set initial focus to {next}", next);
-#endif
+            Focus();
         }
     }
 
@@ -640,4 +635,5 @@ public partial class TaskDialog : ContentControl
     private IInputElement _previousFocus;
     private bool _ignoreWindowClosingEvent;
     private bool _isOpening;
+    private IDisposable _defaultButtonIsEnabledSubscription = null;
 }
