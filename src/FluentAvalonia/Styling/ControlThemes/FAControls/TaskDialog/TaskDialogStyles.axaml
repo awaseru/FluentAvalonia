@@ -132,7 +132,7 @@
                                           VerticalScrollBarVisibility="Auto"
                                           Grid.Row="2"
                                           Margin="{StaticResource TaskDialogContentMargin}">
-                                <StackPanel Spacing="18">
+                                <StackPanel Spacing="11">
                                     <ContentPresenter Name="ContentPresenter"
                                                       Content="{TemplateBinding Content}"
                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
