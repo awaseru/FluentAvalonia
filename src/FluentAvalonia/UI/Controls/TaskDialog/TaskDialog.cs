@@ -498,13 +498,18 @@ public partial class TaskDialog : ContentControl
 
                 _defaultButtonIsEnabledSubscription = _defaultButton.GetObservable(Button.IsEnabledProperty).Subscribe(newValue =>
                 {
-                    if (!newValue) // If the default button has been disabled, focus the main dialog.
+                    var top = TopLevel.GetTopLevel(this);
+                    var focused = top?.FocusManager?.GetFocusedElement();
+                    if (focused is not Visual visual || !this.IsVisualAncestorOf(visual)) // Don't steal focus from a control inside the dialog.
                     {
-                        Focus();
-                    }
-                    else // Otherwise, refocus the default button.
-                    {
-                        _defaultButton.Focus();
+                        if (!newValue) // If the default button has been disabled, focus the main dialog.
+                        {
+                            Focus();
+                        }
+                        else // Otherwise, refocus the default button.
+                        {
+                            _defaultButton.Focus();
+                        }
                     }
                 });
             }
