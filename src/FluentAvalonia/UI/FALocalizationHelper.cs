@@ -1,6 +1,7 @@
 ﻿using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
 using Avalonia.Platform;
 
 namespace FluentAvalonia.UI;
@@ -28,10 +29,10 @@ public partial class FALocalizationHelper
     public static FALocalizationHelper Instance { get; }
 
     /// <summary>
-    /// Gets a string resource by the specified name using the CurrentCulture
+    /// Gets a string resource by the specified name using the CurrentUICulture
     /// </summary>
     public string GetLocalizedStringResource(string resName) =>
-        GetLocalizedStringResource(CultureInfo.CurrentCulture, resName);
+        GetLocalizedStringResource(CultureInfo.CurrentUICulture, resName);
 
     /// <summary>
     /// Gets a string resource by the specified name and using the specified culture
@@ -41,19 +42,29 @@ public partial class FALocalizationHelper
     /// </remarks>
     public string GetLocalizedStringResource(CultureInfo ci, string resName)
     {
-        // Don't allow InvariantCulture - default to en-us in that case
+        string cultureName;
+
+        // If running in globalization-invariant mode, always use "en-US" fallback
         if (ci == CultureInfo.InvariantCulture)
-            ci = new CultureInfo(s_enUS);
+        {
+            cultureName = s_enUS;
+        }
+        else
+        {
+            cultureName = ci.Name;
+        }
 
         if (_mappings.ContainsKey(resName))
         {
-            if (_mappings[resName].ContainsKey(ci.Name))
+            var cultureMap = _mappings[resName];
+
+            if (cultureMap.ContainsKey(cultureName))
             {
-                return _mappings[resName][ci.Name];
+                return cultureMap[cultureName];
             }
-            else if (_mappings[resName].ContainsKey(s_enUS))
+            else if (cultureMap.ContainsKey(s_enUS))
             {
-                return _mappings[resName][s_enUS];
+                return cultureMap[s_enUS];
             }
         }
 

@@ -99,14 +99,6 @@ public partial class NumberBox
     public static readonly StyledProperty<string> PlaceholderTextProperty =
         TextBox.WatermarkProperty.AddOwner<NumberBox>();
 
-    //Skip PreventKeyboardDisplayOnProgrammaticFocus
-
-    /// <summary>
-    /// Defines the <see cref="SelectionFlyout"/> property
-    /// </summary>
-    public static readonly StyledProperty<FlyoutBase> SelectionFlyoutProperty =
-        AvaloniaProperty.Register<NumberBox, FlyoutBase>(nameof(SelectionFlyout));
-
     /// <summary>
     /// Defines the <see cref="SelectionHighlightColor"/> property
     /// </summary>
@@ -123,7 +115,7 @@ public partial class NumberBox
     /// Defines the <see cref="SpinButtonPlacementMode"/> property
     /// </summary>
     public static readonly StyledProperty<NumberBoxSpinButtonPlacementMode> SpinButtonPlacementModeProperty =
-        AvaloniaProperty.Register<NumberBox, NumberBoxSpinButtonPlacementMode>(nameof(SpinButtonPlacementMode), 
+        AvaloniaProperty.Register<NumberBox, NumberBoxSpinButtonPlacementMode>(nameof(SpinButtonPlacementMode),
             NumberBoxSpinButtonPlacementMode.Hidden);
 
     /// <summary>
@@ -132,12 +124,6 @@ public partial class NumberBox
     public static readonly DirectProperty<NumberBox, string> TextProperty =
         AvaloniaProperty.RegisterDirect<NumberBox, string>(nameof(Text),
             x => x.Text, (x, v) => x.Text = v, defaultBindingMode: BindingMode.TwoWay);
-
-    /// <summary>
-    /// Defines the <see cref="TextReadingOrder"/> property
-    /// </summary>
-    public static readonly StyledProperty<TextReadingOrder> TextReadingOrderProperty =
-        AvaloniaProperty.Register<NumberBox, TextReadingOrder>(nameof(TextReadingOrder));
 
     /// <summary>
     /// Defines the <see cref="NumberBoxValidationMode"/> property
@@ -152,7 +138,20 @@ public partial class NumberBox
          RangeBase.ValueProperty.AddOwner<NumberBox>(
              new StyledPropertyMetadata<double>(
                  enableDataValidation: true,
-                 coerce: (ao, d1) => ((NumberBox)ao).CoerceValueToRange(d1)));
+                 coerce: (ao, d1) =>
+                 {
+                     var nb = ao as NumberBox;
+                     var ret = nb.CoerceValueToRange(d1);
+
+                     // If we had to coerce and the coerced value is the same
+                     // as the current value, the text won't get updated and will
+                     // remain the invalid value, force set, see GH#670
+                     if (ret == nb.Value)
+                     {
+                         nb.UpdateTextToValue();
+                     }
+                     return ret;
+                 }));
 
     //Skip InputScope
 
@@ -167,6 +166,12 @@ public partial class NumberBox
     /// </summary>
     public static readonly StyledProperty<string> SimpleNumberFormatProperty =
         AvaloniaProperty.Register<NumberBox, string>(nameof(SimpleNumberFormat));
+
+    /// <summary>
+    /// Defines the <see cref="InnerLeftContent"/> property
+    /// </summary>
+    public static readonly StyledProperty<object> InnerLeftContentProperty =
+        TextBox.InnerLeftContentProperty.AddOwner<NumberBox>();
 
     /// <summary>
     /// Toggles whether the control will accept and evaluate a basic formulaic expression entered as input.
@@ -278,17 +283,6 @@ public partial class NumberBox
     }
 
     /// <summary>
-    /// Gets or sets the flyout that is shown when text is selected, or null if no flyout is shown.
-    /// NOTE: This property is not implemented
-    /// </summary>
-    [NotImplemented]
-    public FlyoutBase SelectionFlyout
-    {
-        get => GetValue(SelectionFlyoutProperty);
-        set => SetValue(SelectionFlyoutProperty, value);
-    }
-
-    /// <summary>
     /// Gets or sets the brush used to highlight the selected text.
     /// </summary>
     public IBrush SelectionHighlightColor
@@ -333,17 +327,6 @@ public partial class NumberBox
     }
 
     /// <summary>
-    /// Gets or sets a value that indicates how the reading order is determined for the NumberBox.
-    /// NOTE This property is not implemented
-    /// </summary>
-    [NotImplemented]
-    public TextReadingOrder TextReadingOrder
-    {
-        get => GetValue(TextReadingOrderProperty);
-        set => SetValue(TextReadingOrderProperty, value);
-    }
-
-    /// <summary>
     /// Gets or sets the input validation behavior to invoke when invalid input is entered.
     /// </summary>
     public NumberBoxValidationMode ValidationMode
@@ -368,6 +351,15 @@ public partial class NumberBox
     {
         get => GetValue(TextAlignmentProperty);
         set => SetValue(TextAlignmentProperty, value);
+    }
+
+    /// <summary>
+    /// Gets or sets the inner left content of the TextBox within the NumberBox
+    /// </summary>
+    public object InnerLeftContent
+    {
+        get => GetValue(InnerLeftContentProperty);
+        set => SetValue(InnerLeftContentProperty, value);
     }
 
     /// <summary>
